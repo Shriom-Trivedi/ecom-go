@@ -1,5 +1,5 @@
 package products
 
-type Service struct {
-	
+type Service interface {
+
 }
