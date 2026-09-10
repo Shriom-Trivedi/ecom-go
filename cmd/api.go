@@ -6,6 +6,7 @@ import (
 	"time"
 
 	repo "github.com/Shriom-Trivedi/ecom-go/internal/adapters/postgresql/sqlc"
+	"github.com/Shriom-Trivedi/ecom-go/internal/orders"
 	"github.com/Shriom-Trivedi/ecom-go/internal/products"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -31,10 +32,16 @@ func (app *application) mount() http.Handler {
 		w.Write([]byte("The server is ACTIVE.")) // health check endpoint
 	})
 
+	// Product service
 	productService := products.NewService(repo.New(app.db))
 	productHandler := products.NewHandler(productService)
 	r.Get("/products", productHandler.ListProducts)
 	r.Get("/product/{id}", productHandler.ListProductByID)
+
+	// Order service
+	orderService := orders.NewService(repo.New(app.db), app.db)
+	ordersHandler := orders.NewHandler(orderService)
+	r.Post("/orders", ordersHandler.PlaceOrder)
 
 	return r
 }
